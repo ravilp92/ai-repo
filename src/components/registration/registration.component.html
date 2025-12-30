@@ -1,0 +1,60 @@
+<div class="d-flex justify-content-center align-items-center min-vh-70">
+  <div class="card p-4 shadow-sm registration-card w-100" style="max-width:480px;">
+    <h3 class="mb-3">Register</h3>
+    <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input data-cy="name" class="form-control" formControlName="name" placeholder="Full name" />
+        <div class="text-danger small mt-1" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+          Name is required
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input data-cy="email" class="form-control" formControlName="email" placeholder="your@email.com" />
+        <div class="text-danger small mt-1" *ngIf="form.get('email')?.touched && form.get('email')?.errors">
+          <span *ngIf="form.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="form.get('email')?.errors?.['email']">Enter a valid email</span>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input data-cy="password" type="password" class="form-control" formControlName="password" placeholder="At least 6 characters" />
+        <div class="text-danger small mt-1" *ngIf="form.get('password')?.touched && form.get('password')?.errors">
+          <span *ngIf="form.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="form.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Re-enter Password</label>
+        <input data-cy="confirmPassword" type="password" class="form-control" formControlName="confirmPassword" />
+        <div class="text-danger small mt-1" *ngIf="(form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.touched)">
+          Passwords do not match
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label me-2">Gender</label>
+        <select data-cy="gender" class="form-select w-auto" formControlName="gender">
+          <option value="">Select</option>
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+          <option value="other">Other</option>
+        </select>
+        <div class="text-danger small mt-1" *ngIf="form.get('gender')?.touched && form.get('gender')?.invalid">
+          Please select gender
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="btn-group">
+          <button type="submit" data-cy="save" class="btn btn-success">Save</button>
+          <button type="button" data-cy="reset" class="btn btn-outline-secondary" (click)="onReset()">Reset</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

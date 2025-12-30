@@ -1,0 +1,12 @@
+:host { display:block; }
+
+.registration-card {
+  border-radius: 12px;
+  font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+.min-vh-70 { min-height: 70vh; }
+
+@media (max-width: 480px) {
+  .registration-card { padding: 1rem; }
+}

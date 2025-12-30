@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.login-card {
+  width: 340px;
+  border-radius: 12px;
+  font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+.min-vh-60 {
+  min-height: 60vh;
+}

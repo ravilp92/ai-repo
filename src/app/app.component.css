@@ -1,0 +1,4 @@
+/* Hide the default placeholder content and rely on routed components */
+main { display: none !important; }
+
+:host { display: block; }
