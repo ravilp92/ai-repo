@@ -8,6 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox",
+    "lint": "eslint \"src/**/*.{ts,html}\" --ext .ts,.html",
+    "lint:fix": "eslint \"src/**/*.{ts,html}\" --ext .ts,.html --fix",
     "cypress:run": "cypress run --headless --browser chrome",
     "e2e": "cypress open"
   },
@@ -36,6 +38,12 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2"
+    "typescript": "~5.7.2",
+    "eslint": "^8.50.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@angular-eslint/eslint-plugin": "^15.0.0",
+    "@angular-eslint/eslint-plugin-template": "^15.0.0",
+    "@angular-eslint/template-parser": "^15.0.0"
   }
 }
