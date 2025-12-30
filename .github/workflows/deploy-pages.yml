@@ -1,0 +1,53 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  pages: write
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      # Optional: set this secret in your repo (Settings -> Secrets -> Actions) to enable automatic CNAME creation
+      CUSTOM_DOMAIN: ${{ secrets.CUSTOM_DOMAIN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint & Test
+        run: |
+          npm run lint --if-present
+          npm run test:ci --silent
+
+      - name: Build (production)
+        run: npm run build -- --configuration production
+
+      - name: Add rpatel (optional)
+        if: env.orchidsalonspa.com != ''
+        run: |
+          echo "${{ env.orchidsalonspa.com}}" > dist/app/rpatel
+
+      - name: Add 404 fallback for SPA routing
+        run: |
+          cp dist/app/index.html dist/app/404.html || true
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: dist/app
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
