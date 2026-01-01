@@ -37,6 +37,13 @@ jobs:
       - name: Build (production)
         run: npm run build -- --configuration production
 
+      - name: Flatten browser output to artifact root
+        run: |
+          # Some Angular builds output to dist/app/browser; ensure index.html is at dist/app root
+          if [ -d "dist/app/browser" ]; then
+            cp -r dist/app/browser/* dist/app/ || true
+          fi
+
       - name: Add CNAME (optional)
         if: ${{ env.CUSTOM_DOMAIN != '' }}
         run: |
