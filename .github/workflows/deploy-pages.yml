@@ -12,6 +12,8 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     env:
       # Optional: set this secret in your repo (Settings -> Secrets -> Actions) to enable automatic CNAME creation
       CUSTOM_DOMAIN: ${{ secrets.CUSTOM_DOMAIN }}
@@ -35,10 +37,10 @@ jobs:
       - name: Build (production)
         run: npm run build -- --configuration production
 
-      - name: Add rpatel (optional)
-        if: env.orchidsalonspa.com != ''
+      - name: Add CNAME (optional)
+        if: ${{ env.CUSTOM_DOMAIN != '' }}
         run: |
-          echo "${{ env.orchidsalonspa.com}}" > dist/app/rpatel
+          echo "${{ env.CUSTOM_DOMAIN }}" > dist/app/CNAME
 
       - name: Add 404 fallback for SPA routing
         run: |
