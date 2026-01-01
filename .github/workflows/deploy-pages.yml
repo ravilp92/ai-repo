@@ -35,7 +35,18 @@ jobs:
           npm run test:ci --silent
 
       - name: Build (production)
-        run: npm run build -- --configuration production
+        run: |
+          # Build with correct base-href:
+          # - If CUSTOM_DOMAIN is set (deploying to a root domain), use '/'
+          # - Otherwise (project page), use '/<repo>/' so assets are resolved under the repo path
+          if [ -n "${{ env.CUSTOM_DOMAIN }}" ]; then
+            echo "Building with base-href / (custom domain)"
+            npm run build -- --configuration production --base-href=/ || npm run build -- --configuration production
+          else
+            repoName="${GITHUB_REPOSITORY##*/}"
+            echo "Building with base-href /$repoName/ (project pages)"
+            npm run build -- --configuration production --base-href=/$repoName/ || npm run build -- --configuration production
+          fi
 
       - name: Flatten browser output to artifact root
         run: |
