@@ -1,0 +1,112 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags: ['v*.*.*']
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ci-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Unit tests (Karma)
+        run: npm run test:ci --silent
+
+  e2e:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5
+        with:
+          start: npm start -- --port 4200
+          wait-on: 'http://localhost:4200'
+          wait-on-timeout: 120000
+          command: npm run cypress:run
+
+  deploy:
+    if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+    needs: e2e
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    env:
+      CUSTOM_DOMAIN: ${{ secrets.CUSTOM_DOMAIN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (production)
+        run: |
+          if [ -n "${{ env.CUSTOM_DOMAIN }}" ]; then
+            echo "Building with base-href / (custom domain)"
+            npm run build -- --configuration production --base-href=/ || npm run build -- --configuration production
+          else
+            repoName="${GITHUB_REPOSITORY##*/}"
+            echo "Building with base-href /$repoName/ (project pages)"
+            npm run build -- --configuration production --base-href=/$repoName/ || npm run build -- --configuration production
+          fi
+
+      - name: Flatten browser output to artifact root
+        run: |
+          if [ -d "dist/app/browser" ]; then
+            cp -r dist/app/browser/* dist/app/ || true
+          fi
+
+      - name: Add CNAME (optional)
+        if: ${{ env.CUSTOM_DOMAIN != '' }}
+        run: |
+          echo "${{ env.CUSTOM_DOMAIN }}" > dist/app/CNAME
+
+      - name: Add 404 fallback for SPA routing
+        run: |
+          cp dist/app/index.html dist/app/404.html || true
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/app
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
