@@ -3,7 +3,7 @@
     <h3 class="mb-3">Login</h3>
     <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
       <div class="mb-3">
-        <label class="form-label">Username</label>
+        <label class="form-label">Usernames</label>
         <input class="form-control" formControlName="username" placeholder="Enter username" />
         <div class="text-danger small mt-1" *ngIf="form.get('username')?.touched && form.get('username')?.invalid">
           Username is required
